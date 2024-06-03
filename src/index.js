@@ -1,9 +1,21 @@
 import dotenv from 'dotenv'
 dotenv.config()
+
 import connectDB from "./db/index.js"
+import app from './app.js'
 
-connectDB()
+//console.log(`${process.env.PORT}`)
+const port = process.env.PORT || 3000
 
+connectDB() // async function returns a promise. then() => function to be executed once I am connected to mongodb
+.then(()=>{
+    app.listen( port, ()=>{
+      console.log(`Server Successfully listening at port ${port}`)
+    })
+})
+.catch((err)=>{
+    console.error("Error in starting the server",err)
+})
 
 
 
