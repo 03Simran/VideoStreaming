@@ -9,6 +9,11 @@ const port = process.env.PORT || 3000
 
 connectDB() // async function returns a promise. then() => function to be executed once I am connected to mongodb
 .then(()=>{
+
+   /*  app.on("err",(err)=>{
+      console.log("Error in starting the server")
+    }) */ //code for listening to a special event before starting the server
+    
     app.listen( port, ()=>{
       console.log(`Server Successfully listening at port ${port}`)
     })
