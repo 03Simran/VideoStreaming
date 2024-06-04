@@ -4,33 +4,43 @@ const userSchema = mongoose.Schema({
     username :{
         type :String,
         required : true,
-        unique:true
+        unique:true,
+        lowercase : true,
+        index:true  //to optimise the search 
+    },
+    password :{
+        type : String,
+        required : true,
+        minlength :[8,"Password is too short"]
     },
     name :{
         type :String,
         required :true
     },
     email:{
-        type :String,
+        type :String, 
         required : true,
-        unique:true
+        unique:true,
+        lowercase : true
     },
     gender :{
         enum:['M','F','O']
     },
     profileImg :{
-        type : String 
+        type : String  //cloudinary url
     },
     coverImg:{
         type : String 
     },
     uploadedVideos : [{
         type : mongoose.Schema.Types.ObjectId,
-        ref : 'Video'
+        ref : 'Video',
+        default:[]
     }],
     watchHistory :[{
         type : mongoose.Schema.Types.ObjectId,
-        ref : 'Video'
+        ref : 'Video',
+        default :[]
     }],
     likes:[{
         type : mongoose.Schema.Types.ObjectId,
@@ -58,7 +68,8 @@ const userSchema = mongoose.Schema({
     tweets :[{
         type: mongoose.Schema.Types.ObjectId,
         ref : 'Tweet'
-    }]
+    }],
+    refreshToken:String
 },{timestamps:true})
 
 export const User = mongoose.Model('User',userSchema)
