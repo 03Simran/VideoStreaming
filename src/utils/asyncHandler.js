@@ -2,12 +2,12 @@
 
 //1. await-async and try-catch
 
-const asyncHandler = (requestHandler)=>async(req,res,next)=>{
+const asyncHandler = (requestHandler)=>async(req,res,next)=>{ //takes a function and also return
    try{
-       await requestHandler(req,res,next)
+       return await requestHandler(req,res,next)
    }
    catch(err){
-    res.code(err.code||500).json({
+    res.sendStatus(err.code||500).json({
         success : false,
         message : err.message || "Error in processing the request"
     })

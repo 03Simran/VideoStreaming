@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema({
     },
     name :{
         type :String,
-        required :true
+        default:""
     },
     email:{
         type :String, 
@@ -26,10 +26,12 @@ const userSchema = mongoose.Schema({
         lowercase : true
     },
     gender :{
-        enum:['M','F','O']
+        enum:['M','F','O'],
+        default : 'M'
     },
     profileImg :{
-        type : String  //cloudinary url
+        type : String,  //cloudinary url
+        required : true
     },
     coverImg:{
         type : String 
@@ -37,12 +39,10 @@ const userSchema = mongoose.Schema({
     uploadedVideos : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Video',
-        default:[]
     }],
     watchHistory :[{
         type : mongoose.Schema.Types.ObjectId,
-        ref : 'Video',
-        default :[]
+        ref : 'Video'
     }],
     likes:[{
         type : mongoose.Schema.Types.ObjectId,

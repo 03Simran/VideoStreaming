@@ -18,7 +18,7 @@ const uploadOnCloudinary = async(localFilePath)=>{ //localfilepath multer will g
      const response =  await cloudinary.uploader.upload(localFilePath,{
         resource_type:"auto"
      })
-
+     
      console.log("File uploaded Successfully")    //needs to be improved I guess 
    }
    catch(error){
@@ -27,4 +27,4 @@ const uploadOnCloudinary = async(localFilePath)=>{ //localfilepath multer will g
    }
 }
 
-export {uploadOnCloudinary}
+export default uploadOnCloudinary
