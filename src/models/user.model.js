@@ -1,4 +1,6 @@
 import mongoose  from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt"
 
 const userSchema = mongoose.Schema({
     username :{
@@ -71,5 +73,48 @@ const userSchema = mongoose.Schema({
     }],
     refreshToken:String
 },{timestamps:true})
+
+// encryption to be done just before data is saved. We can use Middleware prehooks for the same 
+///userSchema.pre("save",()=>{}) // dont write callback this way, as arrow functions in JS are not aware of the current context and we do need it for saving smth.
+ 
+userSchema.pre("save", async function(next){
+   if(!this.isModified("password")) return next() //if password modified, then only encrypt 
+   this.password = bcrypt.hash(this.password,10) //using this directly will encrypt password everytime user makes some chnages in profile
+   next()  
+})
+
+userSchema.methods.isPasswordCorrect = async function(password){ //injecting my custom functions in User Model
+    return await bcrypt.compare(password,this.password)
+}
+
+userSchema.methods.generateAccesToken = function(){
+    return jwt.sign(
+        {
+            name : this.name,
+            _id : this.id,
+            username: this.username,
+            email : this.email
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}   // also injecting methods to gen access and refresh tokens 
+
+userSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
+        {
+            name : this.name,
+            _id : this.id,
+            username: this.username,
+            email : this.email
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+}
 
 export const User = mongoose.Model('User',userSchema)
