@@ -2,7 +2,7 @@
 
 //1. await-async and try-catch
 
-const asyncHandler = (requestHandler)=>async(req,res,next)=>{ //takes a function and also return
+const asyncHandler2 = (requestHandler)=>async(req,res,next)=>{ //takes a function and also return
    try{
        return await requestHandler(req,res,next)
    }
@@ -17,8 +17,8 @@ const asyncHandler = (requestHandler)=>async(req,res,next)=>{ //takes a function
 
 // 2. Promise Resolve and Reject 
 
-const asyncHandler2 = (requestHandler)=>{
-   (req,res,next)=>{
+const asyncHandler = (requestHandler)=>{
+   return (req,res,next)=>{
     Promise.resolve(requestHandler(req,res,next))
            .catch((err)=>next(err))
    }

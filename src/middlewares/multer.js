@@ -5,7 +5,7 @@ import fs from "fs"
 
 const storage = multer.diskStorage({
     destination : function(req,file,cb){
-      cb(null,'/.public/temp')
+      cb(null,'./public/temp')
     },
     filename: function(req,file,cb){
         cb(null,file.originalname)  // can also change it to have all the files unique names
@@ -13,4 +13,6 @@ const storage = multer.diskStorage({
 
 })
 
-export const upload = multer({storage : storage})
+const upload = multer({storage : storage})
+
+export default upload

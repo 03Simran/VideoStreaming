@@ -47,4 +47,6 @@ const videoSchema = mongoose.Schema({
 
 videoSchema.plugin(mongooseAggregatePaginate) // helps in writing aggregate queries , will be needed in watch history
 
-export const Video = mongoose.Model('Video',videoSchema)
+const Video = mongoose.model('Video',videoSchema)
+
+export default Video

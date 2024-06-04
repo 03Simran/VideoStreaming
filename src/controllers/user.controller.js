@@ -1,38 +1,53 @@
+import User from '../models/user.model.js'
 import ApiError from "../utils/ApiError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import asyncHandler from "../utils/asyncHandler.js"
 import uploadOnCloudinary from "../utils/cloudinary.js"
-import User from './src/models/user.model.js'
 
 const registerUser = asyncHandler(  //
     async (req,res)=>{
  
         const {username,password,name,email,gender} = req.body  //data handling , for file handling we need to use the middleware from multer 
 
-        if(email.empty() || username.empty() || password.empty() ){
-            throw ApiError(400,"Username, Email and Password can't be empty")
+        if(!email|| !username || !password ){
+            res.status(400) 
+            throw new ApiError(400,"Username, Email and Password can't be empty")
         }
 
-        const existingUser = (User.findOne({
+        const existingUser = (await User.findOne({
             $or : [{username},{email}]
         }))
         
         if(existingUser) {
-            throw ApiError(409,"User already exists")
+           res.status(409)
+           throw new ApiError(409,"User already exists")
         }
+        
+        console.log(req.files)
 
-        const profileLocalPath = req.files?.profilePhoto[0]?.path  //? : because we dont know if we might get or not
-        const coverLocalPath = req.files?.coverPhoto[0]?.path 
+        let profileLocalPath
+        if(req.files?.profilePhoto){
+            profileLocalPath = req.files?.profilePhoto[0]?.path  //? : because we dont know if we might get or not
+        }
+       
+        let coverLocalPath 
+        if(req.files?.coverPhoto){
+            coverLocalPath= req.files?.coverPhoto[0]?.path 
+        }
 
         if(!profileLocalPath) {
-            throw ApiError(400,"Profile Photo is required")
+           res.status(400)
+           throw new ApiError(400,"Profile Photo is required")
         }
-
+        
+        let coverImg
         const profileImg = await uploadOnCloudinary(profileLocalPath)
-        if(coverLocalPath) {const coverImg = await uploadOnCloudinary(coverLocalPath)}
+        if(coverLocalPath) {coverImg = await uploadOnCloudinary(coverLocalPath)}
+
+        console.log("PROFILEURL:",profileImg)
 
         if(!profileImg){
-            throw ApiError(500,"Issue in uploading file to the Server")
+           res.status(500)
         }
   
         const newUser = await User.create({
@@ -47,15 +62,18 @@ const registerUser = asyncHandler(  //
 
 
 
-        createdUser = User.findById(newUser._id).select(
+        const createdUser = await User.findById(newUser._id).select(
             "-password -refreshToken"
         )
 
         if(!createdUser){
-            throw ApiError(500,"Server Side Error in creating the user")
+            res.status(500)
+            throw new ApiError(500,"Server Side Error in creating the user")
         }
 
-        return res.sendStatus(200).json(
+
+        // res.sendStatus sends the code and closes the request. so to send json as well, we should use res.status
+        res.status(200).json(  
             new ApiResponse(
                 200,
                 createdUser,

@@ -26,8 +26,8 @@ const userSchema = mongoose.Schema({
         lowercase : true
     },
     gender :{
+        type : String,
         enum:['M','F','O'],
-        default : 'M'
     },
     profileImg :{
         type : String,  //cloudinary url
@@ -117,4 +117,6 @@ userSchema.methods.generateRefreshToken = function(){
     )
 }
 
-export const User = mongoose.Model('User',userSchema)
+const User = mongoose.model('User',userSchema)
+
+export default User
