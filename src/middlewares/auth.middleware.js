@@ -8,21 +8,9 @@ const verifyUser = asyncHandler(
 
         try {
             
-            let accessTokenCookie;
-           // console.log(req.headers.cookie);
 
-           console.log(req.cookies.accessToken)
-            const cookies = req.headers.cookie?.split(';')
-
-            for (let i = 0; i < cookies.length; i++) {
-            let cookie1 = cookies[i].trim();
-            if(cookie1.startsWith("accessToken=")){
-              accessTokenCookie =  cookie1.substring('accessToken='.length, cookie1?.length);
-            }   
-        }
-           //console.log(accessTokenCookie);
-   
-            const token = accessTokenCookie || req.headers.Authorization?.replace("Bearer ","")
+          // console.log(req.cookies)
+            const token = req.cookies?.accessToken || req.headers.Authorization?.replace("Bearer ","")
 
         if(!token) {
             throw new ApiError(404,"Unauthorised request")
