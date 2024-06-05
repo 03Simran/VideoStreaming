@@ -10,8 +10,8 @@ const registerUser = asyncHandler(  //
         const {username,password,name,email,gender} = req.body  //data handling , for file handling we need to use the middleware from multer 
 
         if(!email|| !username || !password ){
-            res.status(400) 
-            throw new ApiError(400,"Username, Email and Password can't be empty")
+            return res.send("username empty")
+            
         }
 
         const existingUser = (await User.findOne({
@@ -95,4 +95,99 @@ const registerUser = asyncHandler(  //
      }
 )
 
-export default registerUser
+
+const loginUser = asyncHandler(async(req,res)=>{
+    //take username and password
+    // validations: empty not empty 
+    //check if user exists 
+    //check for password 
+    //generate access and refresh token
+    //send these tokens in cookies 
+
+
+    const{username,email,password}=req.body
+    
+    if(!username && !email){
+        res.send(400)
+        throw new ApiError(400,"Either username or email required")
+    }
+
+    if(!password){
+        res.send(400)
+        throw new ApiError(400,"Password cant be empty")
+    }
+
+    const existingUser = (await User.findOne({
+            $or : [{username},{email}]
+        }))
+
+    if(!existingUser){
+        res.send(404)
+        throw new ApiError(404,"User doesn't exist,register first")
+    }
+
+    const passwordCorrect = await existingUser.isPasswordCorrect(password)
+
+    if(passwordCorrect){
+        //authentic user 
+        const accessToken = await existingUser.generateAccesToken()
+        const refreshTokn = await existingUser.generateRefreshToken()
+
+        existingUser.refreshToken  = refreshTokn
+        await existingUser.save({validateBeforeSave:false})  //.save() method to save in database 
+
+        const { password, refreshToken, ...userWithoutSensitiveInfo } = existingUser.toObject();  //instead of making another db call, just modify the existing User
+ 
+        const options ={
+            httpOnly : true,
+            secure: true
+        }
+
+        res
+        .status(200)
+        .cookie("accessToken",accessToken,options)
+        .cookie("refreshToken", refreshToken,options)
+        .json(
+            new ApiResponse(200,{userWithoutSensitiveInfo,
+                accessToken,refreshTokn
+            },"Logged in Successfully")
+        )
+    }  
+})
+
+
+const logoutUser = asyncHandler(
+    async(req,res)=>{  // we need to find the user from the accesstoken from cookies or request headers // use middleware
+         //clear cookies and find user from db and remove refresh token
+
+         const currUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+              $set :{
+                refreshToken :""
+              }
+            },
+           {
+              new : true
+           }
+        )
+
+        const options ={
+            httpOnly : true,
+            secure: true
+        } 
+
+        res
+        .status(200)
+        .clearCookie("accessToken",options)
+        .clearCookie("refreshToken",options)
+        .json(
+            new ApiResponse(200,{},"Logged Out Successfully")
+        )
+
+
+         
+
+    }
+)
+export { loginUser, registerUser,logoutUser }

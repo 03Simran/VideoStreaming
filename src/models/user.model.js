@@ -36,6 +36,10 @@ const userSchema = mongoose.Schema({
     coverImg:{
         type : String 
     },
+    refreshToken:{
+        type : String,
+        default :""
+    },
     uploadedVideos : [{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Video',
@@ -70,8 +74,7 @@ const userSchema = mongoose.Schema({
     tweets :[{
         type: mongoose.Schema.Types.ObjectId,
         ref : 'Tweet'
-    }],
-    refreshToken:String
+    }]
 },{timestamps:true})
 
 // encryption to be done just before data is saved. We can use Middleware prehooks for the same 
@@ -79,16 +82,16 @@ const userSchema = mongoose.Schema({
  
 userSchema.pre("save", async function(next){
    if(!this.isModified("password")) return next() //if password modified, then only encrypt 
-   this.password = bcrypt.hash(this.password,10) //using this directly will encrypt password everytime user makes some chnages in profile
+   this.password = await bcrypt.hash(this.password,10) //using this directly will encrypt password everytime user makes some chnages in profile
    next()  
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){ //injecting my custom functions in User Model
-    return await bcrypt.compare(password,this.password)
+    return await bcrypt.compare(password,this.password) 
 }
 
-userSchema.methods.generateAccesToken = function(){
-    return jwt.sign(
+userSchema.methods.generateAccesToken =  async function() {
+    return await jwt.sign(
         {
             name : this.name,
             _id : this.id,
@@ -102,8 +105,8 @@ userSchema.methods.generateAccesToken = function(){
     )
 }   // also injecting methods to gen access and refresh tokens 
 
-userSchema.methods.generateRefreshToken = function(){
-    return jwt.sign(
+userSchema.methods.generateRefreshToken = async function(){
+    const refreshToken= await jwt.sign(
         {
             name : this.name,
             _id : this.id,
@@ -115,6 +118,7 @@ userSchema.methods.generateRefreshToken = function(){
             expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
     )
+    return refreshToken
 }
 
 const User = mongoose.model('User',userSchema)
