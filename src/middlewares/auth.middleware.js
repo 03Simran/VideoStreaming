@@ -6,8 +6,6 @@ import jwt from "jsonwebtoken"
 const verifyUser = asyncHandler(
     (req,_,next)=>{  //res not used : can be replaced by _
 
-        try{
-        
           // console.log(req.cookies)
             const token = req.cookies?.accessToken || req.headers.Authorization?.replace("Bearer ","")
 
@@ -26,11 +24,7 @@ const verifyUser = asyncHandler(
 
         req._id = decodedToken._id
         next()
-    }
-        catch(err){
-            console.log(err)
-          throw new ApiError(500,"Server Side error in finding the access token")
-        }
+    
     }
 )
 

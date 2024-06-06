@@ -25,10 +25,10 @@ const uploadOnCloudinary = async(localFilePath)=>{ //localfilepath multer will g
         resource_type:"auto"
      })
      
-     console.log("File uploaded Successfully") 
+     //console.log("File uploaded Successfully") 
 
      fs.unlink(localFilePath,()=>{
-      console.log("Uploaded and Unlinked")
+     // console.log("Uploaded and Unlinked")
      })
      return response   
 

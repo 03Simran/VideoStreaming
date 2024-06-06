@@ -77,13 +77,14 @@ const userSchema = mongoose.Schema({
 ///userSchema.pre("save",()=>{}) // dont write callback this way, as arrow functions in JS are not aware of the current context and we do need it for saving smth.
  
 userSchema.pre("save", async function(next){ //if password modified, then only encrypt 
+    if(!this.isModified("password")) return next()
    this.password = await bcrypt.hash(this.password,10) //using this directly will encrypt password everytime user makes some chnages in profil
    console.log("Password encrypted and save")
    next()  
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){ //injecting my custom functions in User Model 
-    if(!this.isModified("password")) return next()
+   
     return await bcrypt.compare(password,(this.password)) 
 }
 

@@ -23,8 +23,6 @@ const registerUser = asyncHandler(  //
            res.status(409)
            throw new ApiError(409,"User already exists")
         }
-        
-        console.log(req.files)
 
         let profileLocalPath
         if(req.files?.profilePhoto){
@@ -251,9 +249,7 @@ const refreshAccessToken = asyncHandler(
 const changeCurrentPassword = asyncHandler(
     async(req,res)=>{
 
-        try {
-            
-            console.log(req.headers)
+           // console.log(req.headers)
             if(!(req.headers.oldpassword) || !(req.headers.newpassword)){
                 throw new ApiError(400,"Both fields are required")
             }
@@ -272,11 +268,8 @@ const changeCurrentPassword = asyncHandler(
         return res.status(200).json(
             new ApiResponse(200,"Password Updated Successfully")
         )
-}
-        catch(err){
-            console.log(err)
-            throw new ApiError(500,"Error in updating password")
-        }
+
+        
     }
 )
 
@@ -298,4 +291,32 @@ const getCurrentUser = asyncHandler(
     }
 )
 
-export { loginUser, registerUser,logoutUser,refreshAccessToken,changeCurrentPassword,getCurrentUser}
+const updateAccountDetails = asyncHandler(
+    async(req,res)=>{
+        const {name, email, username,gender} = req.body
+
+        const user = await User.findById(req._id)
+
+        if(!user){
+            throw new ApiError(400,"User not found")
+        }
+        
+        if(name) user.name = name 
+        if(email) user.email = email
+        if(username) user.username = username
+        if(gender) user.gender = gender
+
+        user.save({validateBeforeSave:false})
+
+        return res.status(200).json(
+            new ApiResponse(200,user,"Details Updated")
+        )
+    }
+)
+export { loginUser,
+     registerUser,
+     logoutUser,
+    refreshAccessToken,
+    changeCurrentPassword,
+    getCurrentUser,
+    updateAccountDetails}
