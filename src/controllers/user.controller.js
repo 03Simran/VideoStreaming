@@ -269,7 +269,7 @@ const changeCurrentPassword = asyncHandler(
             currUser.password = req.headers.newpassword
             await currUser.save({validateBeforeSave:false}) 
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200,"Password Updated Successfully")
         )
 }
@@ -279,4 +279,23 @@ const changeCurrentPassword = asyncHandler(
         }
     }
 )
-export { loginUser, registerUser,logoutUser,refreshAccessToken,changeCurrentPassword}
+
+const getCurrentUser = asyncHandler(
+    async(req,res)=>{
+          
+       try {const user = await User.findById(req._id)
+        
+        if(!user){
+            throw new ApiError(403,"User not found")
+        }
+
+        return res.status(200).json(
+            new ApiResponse(200,user,"Successful")
+        )}
+        catch(err){
+            console.log(err)
+        }
+    }
+)
+
+export { loginUser, registerUser,logoutUser,refreshAccessToken,changeCurrentPassword,getCurrentUser}

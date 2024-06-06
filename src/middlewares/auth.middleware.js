@@ -10,7 +10,6 @@ const verifyUser = asyncHandler(
         
           // console.log(req.cookies)
             const token = req.cookies?.accessToken || req.headers.Authorization?.replace("Bearer ","")
-            console.log(token)
 
         if(!token) {
             throw new ApiError(404,"Unauthorised request")
@@ -24,11 +23,8 @@ const verifyUser = asyncHandler(
         if(!user){
             throw new ApiError(400,"Invalid/Expired Access Token")
         }
-        
-        console.log("Verify User user:")
 
         req._id = decodedToken._id
-        console.log(req._id)
         next()
     }
         catch(err){

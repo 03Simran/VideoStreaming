@@ -83,6 +83,7 @@ userSchema.pre("save", async function(next){ //if password modified, then only e
 })
 
 userSchema.methods.isPasswordCorrect = async function(password){ //injecting my custom functions in User Model 
+    if(!this.isModified("password")) return next()
     return await bcrypt.compare(password,(this.password)) 
 }
 
