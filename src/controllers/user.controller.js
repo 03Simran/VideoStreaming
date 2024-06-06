@@ -319,7 +319,7 @@ const updateAccountDetails = asyncHandler(
 const updateFiles = asyncHandler(
     async(req,res)=>{
         
-        const user = User.findById(req._id)
+        const user = await User.findById(req._id)
 
         if(!user){
             throw new ApiError(400,"user not found")
@@ -330,14 +330,14 @@ const updateFiles = asyncHandler(
             const profileLocalPath = req.files?.profilePhoto[0]?.path
             console.log(profileLocalPath)
             profileImg = await uploadOnCloudinary(profileLocalPath)
-            console.log(profileImg.url)
+            console.log(profileImg?.url)
         }
        
         if(req.files?.coverPhoto){
            const coverLocalPath= req.files?.coverPhoto[0]?.path
            console.log(coverLocalPath)
            coverImg = await uploadOnCloudinary(coverLocalPath) 
-           console.log(coverImg.url)
+           console.log(coverImg?.url)
         }
 
         if(profileImg) user.profileImg = profileImg.url
