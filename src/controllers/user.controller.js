@@ -305,34 +305,60 @@ const updateAccountDetails = asyncHandler(
         if(email) user.email = email
         if(username) user.username = username
         if(gender) user.gender = gender
+
+        user.save({validateBeforeSave:false})
+
+        const { password, refreshToken, ...userWithoutSensitiveInfo } = user.toObject();
+
+        return res.status(200).json(
+            new ApiResponse(200,userWithoutSensitiveInfo,"Details Updated")
+        )
+    }
+)
+
+const updateFiles = asyncHandler(
+    async(req,res)=>{
         
+        const user = User.findById(req._id)
+
+        if(!user){
+            throw new ApiError(400,"user not found")
+        }
+
         let profileImg, coverImg
         if(req.files?.profilePhoto){
             const profileLocalPath = req.files?.profilePhoto[0]?.path
-            console.log(profileLocalPath)  //? : because we dont know if we might get or not
+            console.log(profileLocalPath)
             profileImg = await uploadOnCloudinary(profileLocalPath)
+            console.log(profileImg.url)
         }
        
         if(req.files?.coverPhoto){
            const coverLocalPath= req.files?.coverPhoto[0]?.path
            console.log(coverLocalPath)
            coverImg = await uploadOnCloudinary(coverLocalPath) 
+           console.log(coverImg.url)
         }
 
-        if(profileImg) {user.profileImg = profileImg}
-        if(coverImg){user.coverImg=coverImg}
+        if(profileImg) user.profileImg = profileImg.url
+        if(coverImg) user.coverImg=coverImg.url
 
         user.save({validateBeforeSave:false})
+        
+        const { password, refreshToken, ...userWithoutSensitiveInfo } = user.toObject();
 
-        return res.status(200).json(
-            new ApiResponse(200,user,"Details Updated")
+        res.status(200).json(
+            new ApiResponse(200,userWithoutSensitiveInfo,"Image updated successfully")
         )
+
     }
 )
+
 export { loginUser,
      registerUser,
      logoutUser,
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
-    updateAccountDetails}
+    updateAccountDetails,
+   updateFiles}
