@@ -6,11 +6,11 @@ import jwt from "jsonwebtoken"
 const verifyUser = asyncHandler(
     (req,_,next)=>{  //res not used : can be replaced by _
 
-        try {
-            
-
+        try{
+        
           // console.log(req.cookies)
             const token = req.cookies?.accessToken || req.headers.Authorization?.replace("Bearer ","")
+            console.log(token)
 
         if(!token) {
             throw new ApiError(404,"Unauthorised request")
@@ -24,9 +24,13 @@ const verifyUser = asyncHandler(
         if(!user){
             throw new ApiError(400,"Invalid/Expired Access Token")
         }
+        
+        console.log("Verify User user:")
 
-        req.user = user
-        next()}
+        req._id = decodedToken._id
+        console.log(req._id)
+        next()
+    }
         catch(err){
             console.log(err)
           throw new ApiError(500,"Server Side error in finding the access token")

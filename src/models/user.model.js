@@ -76,9 +76,9 @@ const userSchema = mongoose.Schema({
 // encryption to be done just before data is saved. We can use Middleware prehooks for the same 
 ///userSchema.pre("save",()=>{}) // dont write callback this way, as arrow functions in JS are not aware of the current context and we do need it for saving smth.
  
-userSchema.pre("save", async function(next){
-   if(!this.isModified("password")) return next() //if password modified, then only encrypt 
-   this.password = await bcrypt.hash(this.password,10) //using this directly will encrypt password everytime user makes some chnages in profile
+userSchema.pre("save", async function(next){ //if password modified, then only encrypt 
+   this.password = await bcrypt.hash(this.password,10) //using this directly will encrypt password everytime user makes some chnages in profil
+   console.log("Password encrypted and save")
    next()  
 })
 

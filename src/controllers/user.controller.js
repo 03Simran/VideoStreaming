@@ -163,7 +163,7 @@ const logoutUser = asyncHandler(
          //clear cookies and find user from db and remove refresh token
 
          const currUser = await User.findByIdAndUpdate(
-            req.user._id,
+            req._id,
             {
               $set :{
                 refreshToken :""
@@ -248,4 +248,32 @@ const refreshAccessToken = asyncHandler(
     }
 )
 
-export { loginUser, registerUser,logoutUser,refreshAccessToken}
+const changeCurrentPassword = asyncHandler(
+    async(req,res)=>{
+
+        try {
+            const currUser = await User.findByIdAndUpdate(
+                req._id,
+                {
+                  $set :{
+                    password :req.headers.password
+                  }
+                },
+               {
+                  new : true
+               }
+            )
+
+            currUser.save() // for using the pre hook to save the password
+
+        res.status(200).json(
+            new ApiResponse(200,"Password Updated Successfully")
+        )
+}
+        catch(err){
+            console.log(err)
+            throw new ApiError(500,"Error in updating password")
+        }
+    }
+)
+export { loginUser, registerUser,logoutUser,refreshAccessToken,changeCurrentPassword}
