@@ -34,6 +34,16 @@ userRouter.route('/changePassword').post(verifyUser,changeCurrentPassword)
 
 userRouter.route('/getUser').get(verifyUser,getCurrentUser)
 
-userRouter.route('/updateAccount').put(verifyUser,updateAccountDetails)
+userRouter.route('/updateAccount').put(verifyUser,upload.fields([    //middleware for file handling in updateAccount
+    {
+        name :"profilePhoto",
+        maxCount :1
+    },
+    {
+        name :"coverPhoto",
+        maxCount :1
+    },
+
+]),updateAccountDetails)
 
 export default userRouter

@@ -43,7 +43,7 @@ const registerUser = asyncHandler(  //
         const profileImg = await uploadOnCloudinary(profileLocalPath)
         if(coverLocalPath) {coverImg = await uploadOnCloudinary(coverLocalPath)}
 
-        console.log("PROFILEURL:",profileImg)
+        //console.log("PROFILEURL:",profileImg)
 
         if(!profileImg){
            res.status(500)
@@ -305,6 +305,22 @@ const updateAccountDetails = asyncHandler(
         if(email) user.email = email
         if(username) user.username = username
         if(gender) user.gender = gender
+        
+        let profileImg, coverImg
+        if(req.files?.profilePhoto){
+            const profileLocalPath = req.files?.profilePhoto[0]?.path
+            console.log(profileLocalPath)  //? : because we dont know if we might get or not
+            profileImg = await uploadOnCloudinary(profileLocalPath)
+        }
+       
+        if(req.files?.coverPhoto){
+           const coverLocalPath= req.files?.coverPhoto[0]?.path
+           console.log(coverLocalPath)
+           coverImg = await uploadOnCloudinary(coverLocalPath) 
+        }
+
+        if(profileImg) {user.profileImg = profileImg}
+        if(coverImg){user.coverImg=coverImg}
 
         user.save({validateBeforeSave:false})
 
