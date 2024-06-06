@@ -6,7 +6,7 @@ import {registerUser,loginUser,logoutUser,
     updateAccountDetails,
     updateFiles
      } from "../controllers/user.controller.js";
-import upload from '../middlewares/multer.js'
+import upload from '../middlewares/multer.middleware.js'
 import { verifyUser } from "../middlewares/auth.middleware.js";
 
 const userRouter = Router()
