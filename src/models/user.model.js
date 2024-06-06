@@ -82,8 +82,8 @@ userSchema.pre("save", async function(next){ //if password modified, then only e
    next()  
 })
 
-userSchema.methods.isPasswordCorrect = async function(password){ //injecting my custom functions in User Model
-    return await bcrypt.compare(password,this.password) 
+userSchema.methods.isPasswordCorrect = async function(password){ //injecting my custom functions in User Model 
+    return await bcrypt.compare(password,(this.password)) 
 }
 
 userSchema.methods.generateAccesToken =  async function() {

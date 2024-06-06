@@ -252,19 +252,22 @@ const changeCurrentPassword = asyncHandler(
     async(req,res)=>{
 
         try {
-            const currUser = await User.findByIdAndUpdate(
-                req._id,
-                {
-                  $set :{
-                    password :req.headers.password
-                  }
-                },
-               {
-                  new : true
-               }
-            )
+            
+            console.log(req.headers)
+            if(!(req.headers.oldpassword) || !(req.headers.newpassword)){
+                throw new ApiError(400,"Both fields are required")
+            }
 
-            currUser.save() // for using the pre hook to save the password
+            const currUser = await User.findById(req._id)
+            
+            const passwordCorrect = await currUser.isPasswordCorrect(req.headers.oldpassword)
+
+            if(!passwordCorrect){
+               throw new ApiError(400,"Old password not correct")
+            }
+
+            currUser.password = req.headers.newpassword
+            await currUser.save({validateBeforeSave:false}) 
 
         res.status(200).json(
             new ApiResponse(200,"Password Updated Successfully")
